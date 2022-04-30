@@ -1,8 +1,6 @@
 import time
 
-
-
-with open("mylogs.log", "r") as logfile:
+with open("mylogs2.log", "r") as logfile:
         for line in logfile.readlines():
                 n = line
                 print (n)

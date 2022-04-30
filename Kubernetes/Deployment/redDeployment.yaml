@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: greendeployment
+  labels:
+    app: script
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: script
+  template:
+    metadata:
+      labels:
+        app: script
+    spec:
+      containers:
+        - image: timba/script:latest
+          name: script
