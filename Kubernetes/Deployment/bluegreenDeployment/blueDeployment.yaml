@@ -15,5 +15,5 @@ spec:
         app: script
     spec:
       containers:
-        - image: timba/script:latest
+        - image: timba/script:1.0
           name: script

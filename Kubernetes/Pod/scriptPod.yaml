@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Pod
+metadata:
+   name: script
+spec:
+   containers:
+   - name: script
+     image: timba/script:1.0
