@@ -1,13 +1,10 @@
-Here is a fully cleaned-up, GitHub-flavored Markdown version of your README designed for direct copy-paste into GitHub’s editor or upload as README.md, ensuring proper formatting with consistent spacing and fenced code blocks:
-
-```markdown
 # Minikube Installation and Usage on Windows with PowerShell and Hyper-V
 
 This guide provides simple instructions to:
 
-- Install Hyper-V PowerShell module
+- Enable Hyper-V and management tools
 - Install Minikube and kubectl CLI tools
-- Start a Minikube cluster using Hyper-V driver
+- Start a Minikube cluster using the Hyper-V driver
 - Verify that Minikube and kubectl are set up correctly
 
 ---
@@ -20,22 +17,22 @@ Search for "PowerShell" in the Start menu, right-click and select **Run as Admin
 
 ## Step 2: Enable Hyper-V and Management Tools
 
-Run these commands in PowerShell to enable Hyper-V and management features:
+Run these commands in an elevated PowerShell window to enable Hyper-V and its management features:
 
-```
+```powershell
 Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All -All
 Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-Management-Tools -All
 ```
 
-If you want only the PowerShell module and management tools, run:
+If you only want the PowerShell module and management tools:
 
-```
+```powershell
 Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-Tools-All -All
 ```
 
 Restart your computer afterwards:
 
-```
+```powershell
 Restart-Computer
 ```
 
@@ -43,41 +40,45 @@ Restart-Computer
 
 ## Step 3: Install Minikube
 
-Create a folder and download Minikube executable:
+Create a directory and download the Minikube executable:
 
+```powershell
+New-Item -Path 'C:' -Name 'minikube' -ItemType Directory -Force
+
+Invoke-WebRequest -OutFile 'C:\minikube\minikube.exe' `
+  -Uri 'https://github.com/kubernetes/minikube/releases/latest/download/minikube-windows-amd64.exe' `
+  -UseBasicParsing
 ```
-New-Item -Path 'C:\' -Name 'minikube' -ItemType Directory -Force
 
-Invoke-WebRequest -OutFile 'C:\minikube\minikube.exe' -Uri 'https://github.com/kubernetes/minikube/releases/latest/download/minikube-windows-amd64.exe' -UseBasicParsing
-```
+Add Minikube to the system PATH (machine-level):
 
-Add Minikube to your system PATH:
-
-```
+```powershell
 $oldPath = [Environment]::GetEnvironmentVariable('Path', [EnvironmentVariableTarget]::Machine)
 if ($oldPath.Split(';') -notcontains 'C:\minikube') {
   [Environment]::SetEnvironmentVariable('Path', "$oldPath;C:\minikube", [EnvironmentVariableTarget]::Machine)
 }
 ```
 
-Close and reopen PowerShell.
+Close and reopen PowerShell to pick up the PATH change.
 
 ---
 
 ## Step 4: Install kubectl CLI
 
-Download kubectl executable:
+Download kubectl executable (adjust version or URL as needed):
 
-```
-Invoke-WebRequest -OutFile 'C:\kubectl.exe' -Uri 'https://dl.k8s.io/release/v1.34.0/bin/windows/amd64/kubectl.exe' -UseBasicParsing
+```powershell
+Invoke-WebRequest -OutFile 'C:\kubectl.exe' `
+  -Uri 'https://dl.k8s.io/release/v1.34.0/bin/windows/amd64/kubectl.exe' `
+  -UseBasicParsing
 ```
 
-Add kubectl to your system PATH:
+Add C:\ (or the folder where kubectl.exe is located) to the system PATH if not already present:
 
-```
+```powershell
 $oldPath = [Environment]::GetEnvironmentVariable('Path', [EnvironmentVariableTarget]::Machine)
-if ($oldPath.Split(';') -notcontains 'C:\') {
-  [Environment]::SetEnvironmentVariable('Path', "$oldPath;C:\", [EnvironmentVariableTarget]::Machine)
+if ($oldPath.Split(';') -notcontains 'C:') {
+  [Environment]::SetEnvironmentVariable('Path', "$oldPath;C:", [EnvironmentVariableTarget]::Machine)
 }
 ```
 
@@ -87,12 +88,19 @@ Close and reopen PowerShell.
 
 ## Step 5: Start Minikube with Hyper-V Driver
 
-```
+Before starting, you can remove any old clusters:
+
+```powershell
 minikube delete --all --purge
+```
+
+Start Minikube using the Hyper-V driver:
+
+```powershell
 minikube start --driver=hyperv
 ```
 
-If you see errors about the Hyper-V PowerShell module, ensure it is installed and enabled (see Step 2).
+If you see errors about the Hyper-V PowerShell module, ensure it's installed and enabled (see Step 2).
 
 ---
 
@@ -100,15 +108,15 @@ If you see errors about the Hyper-V PowerShell module, ensure it is installed an
 
 Check Minikube status:
 
-```
+```powershell
 minikube status
 ```
 
-The output should show "Running" for host, kubelet, and apiserver.
+You should see "Running" for host, kubelet, and apiserver.
 
 Check kubectl access to the cluster:
 
-```
+```powershell
 kubectl get nodes
 kubectl get pods --all-namespaces
 ```
@@ -117,43 +125,21 @@ kubectl get pods --all-namespaces
 
 ## Troubleshooting
 
-- If Minikube fails to start due to missing config files, run:
+- If Minikube fails to start due to missing or corrupt config files, run:
 
-```
+```powershell
 minikube delete --all --purge
-Remove-Item -Recurse -Force $env:USERPROFILE\.minikube
+Remove-Item -Recurse -Force "$env:USERPROFILE\.minikube"
 ```
 
-- Always run PowerShell as Administrator for privileged commands.
+- Run PowerShell as Administrator for all commands that modify system features or machine-level environment variables.
 
-- If Hyper-V is unavailable or problematic, consider using Docker driver instead (requires Docker Desktop installed):
+- If Hyper-V is unavailable or problematic, consider using the Docker driver instead (requires Docker Desktop):
 
-```
+```powershell
 minikube start --driver=docker
 ```
 
 ---
 
-This README is formatted for direct copy-paste or upload to GitHub and should render correctly with consistent indentation, code blocks, and spacing.
-```
-
-**Key points:**
-
-- Every code block is fenced with triple backticks and no indentation to ensure GitHub properly detects it.
-- Blank lines separate headings, paragraphs, and code blocks for clean rendering.
-- PowerShell language identifier in fenced blocks (optional) can be omitted or kept; GitHub handles both well.
-- Headings have space after `#` for proper Markdown recognition.
-
-Copy and paste this entire block in one go into your GitHub README.md file via the web editor or your local file for a neat, cleanly formatted document.
-
-If you want, the raw `.md` content can also be attached for easy upload—just ask. This should fully resolve formatting issues and improve readability.
-
-[1](https://docs.github.com/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)
-[2](https://github.com/adam-p/markdown-here/wiki/markdown-cheatsheet)
-[3](https://gist.github.com/apaskulin/1ad686e42c7165cb9c22f9fe1e389558)
-[4](https://google.github.io/styleguide/docguide/style.html)
-[5](https://www.markdownguide.org/basic-syntax/)
-[6](https://daily.dev/blog/best-practices-for-github-markdown-badges)
-[7](https://docs.github.com/articles/about-writing-and-formatting-on-github)
-[8](https://www.hatica.io/blog/best-practices-for-github-readme/)
-[9](https://github.com/darsaveli/Readme-Markdown-Syntax)
+This README is formatted for GitHub and uses fenced code blocks for command sequences to make it easy to copy and paste into PowerShell.
