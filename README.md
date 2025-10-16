@@ -49,7 +49,6 @@ Invoke-WebRequest -OutFile 'C:\kubectl.exe' `
 minikube delete --all --purge
 # Start with Hyper-V driver (or use docker if preferred)
 minikube start --driver=hyperv
-# If you have issues starting minikube please try docker driver instead, check command in Troubleshooting below
 ```
 
 ### Quick Windows Troubleshooting 🛠️
@@ -146,6 +145,11 @@ kubectl logs $POD
 kubectl exec -it $POD -- /bin/sh
 # inside: ls /usr/share/nginx/html ; exit
 ```
+
+if you use Powershell: 
+copy pod name from and insert in <> below:
+kubectl get pods
+# then use: kubectl logs <pod-name>
 
 6) Cleanup (2–5 min)
 ```bash
