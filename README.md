@@ -49,6 +49,7 @@ Invoke-WebRequest -OutFile 'C:\kubectl.exe' `
 minikube delete --all --purge
 # Start with Hyper-V driver (or use docker if preferred)
 minikube start --driver=hyperv
+# If you have issues starting minikube please try docker driver instead, check command in Troubleshooting below
 ```
 
 ### Quick Windows Troubleshooting 🛠️
