@@ -1,52 +1,111 @@
-Step 1: Open PowerShell as Administrator
-Search for "PowerShell" in the Start menu.
+text
+# Minikube Installation and Setup on Windows (PowerShell & Hyper-V)
 
-Right-click "Windows PowerShell" and select "Run as Administrator".
+This guide provides simple step-by-step instructions to install and run Minikube—a local Kubernetes single-node cluster—on a Windows machine using PowerShell and Hyper-V.
 
-Step 2: Install Hyper-V PowerShell Module and Hyper-V Feature
-Run the following command to install Hyper-V with the PowerShell module and management tools, and restart if needed:
+---
 
-powershell
-Install-WindowsFeature -Name Hyper-V -IncludeManagementTools -Restart
-Your machine will restart after this step if Hyper-V is not already enabled.
+## Prerequisites
 
-Step 3: Download and Install Minikube
-Run these commands to create a folder and download Minikube executable:
+- Windows 10 Pro or higher with Hyper-V support
+- PowerShell running as Administrator
+- Internet connection
 
-powershell
-New-Item -Path 'C:\' -Name 'minikube' -ItemType Directory -Force
+---
+
+## Step 1: Enable Hyper-V and PowerShell Module
+
+Open PowerShell as Administrator and run:
+
+Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All -All
+Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-Management-Tools -All
+Restart-Computer
+
+text
+
+This installs Hyper-V virtualization platform and management tools with PowerShell support.
+
+---
+
+## Step 2: Download and Install Minikube
+
+Run in PowerShell:
+
+New-Item -Path 'C:' -Name 'minikube' -ItemType Directory -Force
 
 Invoke-WebRequest -OutFile 'C:\minikube\minikube.exe' -Uri 'https://github.com/kubernetes/minikube/releases/latest/download/minikube-windows-amd64.exe' -UseBasicParsing
-Add Minikube to your system PATH:
 
-powershell
 $oldPath = [Environment]::GetEnvironmentVariable('Path', [EnvironmentVariableTarget]::Machine)
 if ($oldPath.Split(';') -notcontains 'C:\minikube') {
-  [Environment]::SetEnvironmentVariable('Path', "$oldPath;C:\minikube", [EnvironmentVariableTarget]::Machine)
+[Environment]::SetEnvironmentVariable('Path', "$oldPath;C:\minikube", [EnvironmentVariableTarget]::Machine)
 }
-Close and reopen PowerShell after this.
 
-Step 4: Install kubectl (Kubernetes CLI)
-Download kubectl binary with this command:
+text
 
-powershell
+Close and reopen PowerShell to refresh your PATH.
+
+---
+
+## Step 3: Install kubectl
+
+Download kubectl CLI:
+
 Invoke-WebRequest -OutFile 'C:\kubectl.exe' -Uri 'https://dl.k8s.io/release/v1.34.0/bin/windows/amd64/kubectl.exe' -UseBasicParsing
-Add kubectl to your system PATH:
 
-powershell
 $oldPath = [Environment]::GetEnvironmentVariable('Path', [EnvironmentVariableTarget]::Machine)
-if ($oldPath.Split(';') -notcontains 'C:\') {
-  [Environment]::SetEnvironmentVariable('Path', "$oldPath;C:\", [EnvironmentVariableTarget]::Machine)
+if ($oldPath.Split(';') -notcontains 'C:') {
+[Environment]::SetEnvironmentVariable('Path', "$oldPath;C:", [EnvironmentVariableTarget]::Machine)
 }
-Close and reopen PowerShell again.
 
-Step 5: Verify Installation
-Check Minikube version:
+text
 
-powershell
-minikube version
-Check kubectl version:
+Restart PowerShell again.
 
-powershell
-kubectl version --client
-These steps will get Minikube and kubectl installed on your Windows machine with Hyper-V enabled, using PowerShell
+---
+
+## Step 4: Start Minikube with Hyper-V Driver
+
+In an elevated PowerShell prompt:
+
+minikube delete --all --purge
+minikube start --driver=hyperv
+minikube status
+
+text
+
+You should see all Minikube components running with status like:
+
+minikube
+type: Control Plane
+host: Running
+kubelet: Running
+apiserver: Running
+kubeconfig: Configured
+
+text
+
+---
+
+## Step 5: Verify Cluster with kubectl
+
+Test your Kubernetes cluster:
+
+kubectl get nodes
+kubectl get pods --all-namespaces
+
+text
+
+---
+
+## Notes
+
+- Make sure to run PowerShell as Administrator for Hyper-V commands.
+- If you face network issues pulling container images, you may need to configure proxy settings inside Minikube.
+- To stop your cluster: `minikube stop`
+- To completely remove: `minikube delete`
+
+---
+
+This setup provides a quick local Kubernetes environment for development and testing on Windows using Minikube and Hyper-V.
+
+---
