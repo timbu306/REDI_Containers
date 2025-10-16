@@ -146,7 +146,7 @@ kubectl exec -it $POD -- /bin/sh
 # inside: ls /usr/share/nginx/html ; exit
 ```
 
-if you use Powershell, copy pod name from and insert in <> below:
+if you use Powershell, instead of above step 5, copy pod name from and insert in <> below:
 ```bash
 kubectl get pods
 # then use: kubectl logs <pod-name>
