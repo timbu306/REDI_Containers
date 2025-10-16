@@ -138,7 +138,3 @@ rm -rf "$HOME/.minikube"
 ```bash
 minikube start --driver=docker
 ```
-
----
-
-This README now includes icons for clarity and an added macOS section with Homebrew, kubectl and Minikube installation steps. Enjoy! 🚀****
